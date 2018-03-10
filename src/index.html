@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="./css/index.css">
   <link rel="stylesheet" href="./css/resume.css">
   <link rel="stylesheet" href="./css/editable-span.css">
+  <link rel="stylesheet" href="./css/login.css">
+  <link rel="stylesheet" href="./css/sign-up.css">
   <title>简历编辑器</title>
 </head>
 <body>
@@ -15,8 +17,7 @@
       <div class="upper">
         <ul class="actions">
           <li>
-            
-            <button class="button">保存</button>
+            <button class="button" @click="onClickSave">保存</button>
           </li>
           <li>
             <button class="button">分享</button>
@@ -34,7 +35,9 @@
       </div>
     </aside>
     <main>
+      
       <div class="resume">
+          {{resume}}
         <section class="profile">
           <h1>
             <editable-span v-bind:value="resume.name" v-on:edit="onEdit('name',$event)"></editable-span>
@@ -127,6 +130,42 @@
         </section>
       </div>
     </main>
+    <div v-show="loginVisible" class="login" >
+      <form class="form">
+        <h2>登录</h2>
+        <button @click="loginVisible = false" >关闭</button>
+        <div class="row">
+          <label>邮箱</label>
+          <input type="text" name="userName">
+        </div>
+        <div class="row">
+          <label>密码</label>
+          <input type="password" name="password">
+        </div>
+        <div class="actions">
+          <button type="submit">提交</button>
+          <a href="#" @click="signUpVisible = true;loginVisible = false">注册</a>
+        </div>
+      </form>
+    </div>
+    <div v-show="signUpVisible" class="signUp">
+      <form class="form">
+          <h2>注册</h2>
+          <button @click="signUpVisible = false" >关闭</button>
+          <div class="row">
+            <label>邮箱</label>
+            <input type="text" name="userName">
+          </div>
+          <div class="row">
+            <label>密码</label>
+            <input type="password" name="password">
+          </div>
+          <div class="actions">
+            <button type="submit">提交</button>
+            <a href="#" @click="loginVisible = true;signUpVisible = false">登录</a>
+          </div>
+        </form>
+    </div>
   </div>
 
 
