@@ -4,6 +4,7 @@ a { text-decoration: none; color: inherit; }
 ul, ol { list-style: none; }
 body { font-size: 18px; }
 button { font: inherit; }
+div[v-cloak]{display: none;}
 @media (min-width: 500px) {
     .page { height: 100vh; overflow: hidden;
         display: flex;

@@ -41,9 +41,13 @@ let app = new Vue({
       user.setPassword(this.signUp.password)
       user.setEmail(this.signUp.email)
       user.signUp().then(function (loginedUser) {
-        console.log(loginedUser)
+        alert('注册成功,请登录')
       }, function (error) {
-        console.log(error)
+        if(error.code === 203 || error.code === 203 || error.code === 214){
+          alert('邮箱已经存在。')
+        }else if(error.code === 125){
+          alert('邮箱无效，请重新输入')
+        }
       })
     },
     onLogout(){
@@ -53,9 +57,11 @@ let app = new Vue({
     },
     onLogin(){
       AV.User.logIn(this.login.email, this.login.password).then(function (loginedUser) {
-        console.log(loginedUser);
+        alert('登录成功')
       }, function (error) {
-        console.log(error)
+          if(error.code === 210){
+            alert('邮箱与密码不匹配.')
+          }
       });
     }
   }
