@@ -30,14 +30,14 @@
           </li>
         </ul>
       </div>
-      <div class="down">
-        <button class="button" @click="onLogout">登出</button>
+      <div class="down" v-cloak>
+        <button class="button" @click="onLogout" v-show="hasLogin()" >登出</button>
       </div>
     </aside>
     <main>
       
       <div class="resume">
-          {{resume}}
+        {{currentUser}}
         <section class="profile">
           <h1>
             <editable-span v-bind:value="resume.name" v-on:edit="onEdit('name',$event)"></editable-span>
