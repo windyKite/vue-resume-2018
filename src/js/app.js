@@ -5,6 +5,7 @@ let app = new Vue({
     loginVisible:false,
     signUpVisible:false,
     shareVisible:false,
+    skinPickerVisible:false,
     previewUser:{
       objectId:undefined,
     },
@@ -166,6 +167,10 @@ let app = new Vue({
     },
     print(){
       window.print()
+    },
+    setTheme(themeName){
+      console.log('改变一下className')
+      // v-bing:class="主题class名"
     },
   }
 })
