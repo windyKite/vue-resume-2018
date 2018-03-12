@@ -20,7 +20,7 @@
   padding: 10px;
   position: relative;
 }
-.resume  .skills > ul > li > span.removeSkill{
+.resume  .skills > ul > li .removeSkill{
   position: absolute;
   top: 0;
   right: 0;
