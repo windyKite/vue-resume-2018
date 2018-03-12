@@ -4,9 +4,31 @@ let app = new Vue({
     editingName:false,
     loginVisible:false,
     signUpVisible:false,
+    shareVisible:false,
+    previewUser:{
+      objectId:undefined,
+    },
     currentUser:{
       objectId: undefined,
       email: '',
+    },
+    previewResume:{
+      name:'姓名',
+      gender:'女',
+      birthday:'1995年11月',
+      jobTitle:'前端工程师',
+      phone:'18826132439',
+      email:'example@example.com',
+      skills:[
+        {name:'请输入技能名字',description:'请输入详细描述'},
+        {name:'请输入技能名字',description:'请输入详细描述'},
+        {name:'请输入技能名字',description:'请输入详细描述'},
+        {name:'请输入技能名字',description:'请输入详细描述'},
+      ],
+      projects:[
+        {name:'请输入项目名字',link:'https:xxx/xxx',keywords:'关键词',description:'清详细描述'},
+        {name:'请输入项目名字',link:'https:xxx/xxx',keywords:'关键词',description:'清详细描述'},
+      ],
     },
     resume:{
       name:'姓名',
@@ -34,6 +56,20 @@ let app = new Vue({
       email:'',
       password:'',
     },
+    shareLink:'',
+    mode:'edit',  // preview
+  },
+  // watch:{
+  //   'currentUser.objectId': function(newValue,oldValue){
+  //     if(newValue){
+  //       this.getResume(this.currentUser)
+  //     }
+  //   }
+  // },
+  computed:{
+    displayResume(){
+      return this.mode === 'preview' ? this.previewResume : this.resume
+    }
   },
   methods:{
     onEdit(key,value){
@@ -72,18 +108,17 @@ let app = new Vue({
       }
     },
     saveResume(){
-      alert(1)
       let {objectId} = AV.User.current().toJSON()
       let user = AV.Object.createWithoutData('User', objectId)
       user.set('resume',this.resume)
       user.save()
+      alert('保存成功')
     },
-    getResume(){
+    getResume(user){
       let query = new AV.Query('User');
-      query.get(this.currentUser.objectId).then((user)=>{
+      return query.get(user.objectId).then((user)=>{
         let resume = user.toJSON().resume
-        Object.assign(this.resume, resume)
-        console.log(user.toJSON())
+        return resume
       }, (error)=>{
         console.log(error)
       })
@@ -119,6 +154,7 @@ let app = new Vue({
         this.currentUser.objectId = user.objectId
         this.currentUser.email = user.email
         this.loginVisible = false
+        app.shareLink = location.origin + location.pathname + '?user_id=' + app.currentUser.objectId
       }, (error) =>{
           if(error.code === 210){
             alert('邮箱与密码不匹配.')
@@ -132,8 +168,26 @@ let app = new Vue({
   }
 })
 
+
+// 判断当前是否登录，若登录，则获取当前用户并设置分享链接
 let currentUser = AV.User.current()
 if(currentUser){
   app.currentUser = currentUser.toJSON()
-  app.getResume()
+  app.shareLink = location.origin + location.pathname + '?user_id=' + app.currentUser.objectId 
+  app.getResume(app.currentUser).then((resume)=>{
+    app.resume = resume
+  })
+}
+
+// 判断有没有预览id，获取预览用户的id
+let search = location.search 
+let regex = /user_id=([^&]+)/
+let matches = search.match(regex)
+let userId
+if(matches){
+  userId = matches[1]
+  app.mode = 'preview'
+  app.getResume({objectId:userId}).then((resume)=>{
+    app.previewResume = resume
+  })
 }
