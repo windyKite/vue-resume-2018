@@ -15,6 +15,12 @@ let app = new Vue({
       jobTitle:'前端工程师',
       phone:'18826132439',
       email:'example@example.com',
+      skills:[
+        {name:'请输入技能名字',description:'请输入详细描述'},
+        {name:'请输入技能名字',description:'请输入详细描述'},
+        {name:'请输入技能名字',description:'请输入详细描述'},
+        {name:'请输入技能名字',description:'请输入详细描述'},
+      ],
     },
     signUp:{
       email:'',
@@ -27,7 +33,25 @@ let app = new Vue({
   },
   methods:{
     onEdit(key,value){
-      this.resume[key] = value
+      let regex = /\[(\d+)\]/g
+      key = key.replace(regex, (match, number )=>{
+        return '.' + number
+      })
+      let keys = key.split('.')
+      let result = this.resume
+      for(let i = 0; i < keys.length; i++){
+        if(i === keys.length - 1){
+          result[keys[i]] = value
+        }else{
+          result = result[keys[i]]
+        }
+      }
+    },
+    addSkill(){
+      this.resume.skills.push({name:'请输入技能名字',description:'请输入详细描述'})
+    },
+    removeSkill(index){
+      this.resume.skills.splice(index,1)
     },
     onClickSave(){
       let currentUser = AV.User.current()
@@ -81,6 +105,7 @@ let app = new Vue({
     onLogin(){
       AV.User.logIn(this.login.email, this.login.password).then((user)=> {
         user = user.toJSON()
+        Object.assign(this.resume, user.resume)
         this.currentUser.objectId = user.objectId
         this.currentUser.email = user.email
         this.loginVisible = false
