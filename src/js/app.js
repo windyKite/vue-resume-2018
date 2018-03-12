@@ -59,13 +59,13 @@ let app = new Vue({
     shareLink:'',
     mode:'edit',  // preview
   },
-  // watch:{
-  //   'currentUser.objectId': function(newValue,oldValue){
-  //     if(newValue){
-  //       this.getResume(this.currentUser)
-  //     }
-  //   }
-  // },
+  watch:{
+    'currentUser.objectId': function(newValue,oldValue){
+      if(newValue){
+        this.getResume(this.currentUser)
+      }
+    }
+  },
   computed:{
     displayResume(){
       return this.mode === 'preview' ? this.previewResume : this.resume
@@ -164,7 +164,9 @@ let app = new Vue({
     hasLogin(){
       return !!this.currentUser.objectId
     },
-    
+    print(){
+      window.print()
+    },
   }
 })
 
