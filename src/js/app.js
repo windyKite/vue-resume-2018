@@ -49,21 +49,17 @@ let app = new Vue({
         {name:'请输入项目名字',link:'https:xxx/xxx',keywords:'关键词',description:'清详细描述'},
       ],
     },
-    signUp:{
-      email:'',
-      password:'',
-    },
-    login:{
-      email:'',
-      password:'',
-    },
     shareLink:'',
     mode:'edit',  // preview
   },
   watch:{
     'currentUser.objectId': function(newValue,oldValue){
       if(newValue){
-        this.getResume(this.currentUser)
+        this.getResume(this.currentUser).then((resume)=>{
+          if(resume){
+            this.resume = resume
+          }
+        })
       }
     }
   },
@@ -73,41 +69,6 @@ let app = new Vue({
     }
   },
   methods:{
-    onEdit(key,value){
-      let regex = /\[(\d+)\]/g
-      key = key.replace(regex, (match, number )=>{
-        return '.' + number
-      })
-      let keys = key.split('.')
-      let result = this.resume
-      for(let i = 0; i < keys.length; i++){
-        if(i === keys.length - 1){
-          result[keys[i]] = value
-        }else{
-          result = result[keys[i]]
-        }
-      }
-    },
-    addSkill(){
-      this.resume.skills.push({name:'请输入技能名字',description:'请输入详细描述'})
-    },
-    removeSkill(index){
-      this.resume.skills.splice(index,1)
-    },
-    addProject(){
-      this.resume.projects.push({name:'请输入项目名字',link:'https:xxx/xxx',keywords:'关键词',description:'清详细描述'})
-    },
-    removeProject(index){
-      this.resume.projects.splice(index,1)
-    },
-    onClickSave(){
-      let currentUser = AV.User.current()
-      if (!currentUser) {
-        this.signUpVisible = true
-      }else {
-        this.saveResume()
-      }
-    },
     saveResume(){
       let {objectId} = AV.User.current().toJSON()
       let user = AV.Object.createWithoutData('User', objectId)
@@ -124,54 +85,29 @@ let app = new Vue({
         console.log(error)
       })
     },
-    onSignUp(e){
-      let user = new AV.User()
-      user.setUsername(this.signUp.email)
-      user.setPassword(this.signUp.password)
-      user.setEmail(this.signUp.email)
-      user.signUp().then((user) =>{
-        alert('注册成功')
-        user = user.toJSON()
-        this.currentUser.objectId = user.objectId
-        this.currentUser.email = user.email
-        this.signUpVisible = false
-      }, (error)=>{
-        if(error.code === 203 || error.code === 203 || error.code === 214){
-          alert('邮箱已经存在。')
-        }else if(error.code === 125){
-          alert('邮箱无效，请重新输入')
-        }
-      })
+    onSignUp(user){
+      this.currentUser.objectId = user.objectId
+      this.currentUser.email = user.email
+      this.signUpVisible = false
+
     },
-    onLogout(){
-      AV.User.logOut()
-      alert('注销成功')
-      window.location.reload()
+    goToSignUp(){
+      this.loginVisible = false
+      this.signUpVisible = true
     },
-    onLogin(){
-      AV.User.logIn(this.login.email, this.login.password).then((user)=> {
-        user = user.toJSON()
-        Object.assign(this.resume, user.resume)
-        this.currentUser.objectId = user.objectId
-        this.currentUser.email = user.email
-        this.loginVisible = false
-        app.shareLink = location.origin + location.pathname + '?user_id=' + app.currentUser.objectId
-      }, (error) =>{
-          if(error.code === 210){
-            alert('邮箱与密码不匹配.')
-          }
-      })
+    goToLogin(){
+      this.loginVisible = true
+      this.signUpVisible = false
     },
-    hasLogin(){
-      return !!this.currentUser.objectId
+    onLogin(user){
+      this.currentUser.objectId = user.objectId
+      this.currentUser.email = user.email
+      this.loginVisible = false
     },
-    print(){
-      window.print()
-    },
-    setTheme(themeName){
-      console.log('改变一下className')
-      // v-bing:class="主题class名"
-    },
+    share(shareLink){
+      this.shareLink = shareLink
+      this.shareVisible = !this.shareVisible
+    }
   }
 })
 
@@ -182,7 +118,9 @@ if(currentUser){
   app.currentUser = currentUser.toJSON()
   app.shareLink = location.origin + location.pathname + '?user_id=' + app.currentUser.objectId 
   app.getResume(app.currentUser).then((resume)=>{
-    app.resume = resume
+    if(resume){
+      app.resume = resume
+    }
   })
 }
 
